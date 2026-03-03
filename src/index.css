@@ -2,30 +2,18 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
-:root {
-  --navy-950: #0a0e1a;
-  --navy-900: #0f1629;
-  --navy-800: #1a2340;
-  --navy-700: #253158;
-  --gold-500: #d4a853;
-  --gold-400: #e4be6a;
-  --gold-300: #f0d48a;
-  --red-600: #c41e3a;
-  --red-500: #dc2626;
-}
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--navy-950);
-  color: #e8e8e8;
+  background: #ffffff;
+  color: #1a1a1a;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--gold-500);
-  color: var(--navy-950);
+  background: #c41e3a;
+  color: #ffffff;
 }
 
 html { scroll-behavior: smooth; }
