@@ -27,27 +27,18 @@ function Counter({ end, suffix = '', duration = 2 }: { end: number; suffix?: str
   return <span ref={ref}>{count}{suffix}</span>
 }
 
-// ─── REVEAL (IntersectionObserver + CSS transition with fallback) ───
+// ─── SECTION REVEAL ───
 function Reveal({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [visible, setVisible] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const fallback = setTimeout(() => setVisible(true), 1500 + delay * 1000)
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); io.disconnect() } }, { threshold: 0.08 })
-    io.observe(el)
-    return () => { io.disconnect(); clearTimeout(fallback) }
-  }, [delay])
-
   return (
-    <div ref={ref} className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(24px)',
-        transition: `opacity 0.7s cubic-bezier(0.22,1,0.36,1) ${delay}s, transform 0.7s cubic-bezier(0.22,1,0.36,1) ${delay}s`,
-      }}
-    >{children}</div>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.1 }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
   )
 }
 
