@@ -43,11 +43,11 @@ function Reveal({ children, className = '', delay = 0 }: { children: React.React
 }
 
 /* ─── SECTION LABEL ─── */
-function SectionLabel({ text, light = false }: { text: string; light?: boolean }) {
+function SectionLabel({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-3 mb-8">
-      <div className={`w-8 h-[2px] ${light ? 'bg-white/40' : 'bg-[#c41e3a]'}`} />
-      <span className={`text-[11px] tracking-[0.35em] uppercase font-semibold ${light ? 'text-white/60' : 'text-[#c41e3a]'}`}>{text}</span>
+      <div className="w-8 h-[2px] bg-[#c41e3a]" />
+      <span className="text-[11px] tracking-[0.35em] uppercase font-semibold text-[#c41e3a]">{text}</span>
     </div>
   )
 }
@@ -78,31 +78,25 @@ function Navbar() {
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
           ? 'bg-white/95 backdrop-blur-2xl shadow-[0_1px_30px_rgba(0,0,0,0.06)]'
-          : 'bg-transparent'
+          : 'bg-white/80 backdrop-blur-xl'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
           <a href="#" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-[#c41e3a] flex items-center justify-center transition-transform group-hover:scale-105">
+            <div className="w-10 h-10 bg-[#c41e3a] flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
               <span className="font-['Playfair_Display'] text-white text-lg font-bold">P</span>
             </div>
             <div className="hidden sm:block">
-              <div className={`font-['Playfair_Display'] text-[15px] font-bold tracking-[0.08em] transition-colors duration-500 ${scrolled ? 'text-zinc-900' : 'text-white'}`}>
-                PALAZUELOS
-              </div>
-              <div className={`text-[9px] tracking-[0.4em] uppercase -mt-0.5 transition-colors duration-500 ${scrolled ? 'text-zinc-400' : 'text-white/50'}`}>
-                Grupo Logístico
-              </div>
+              <div className="font-['Playfair_Display'] text-[15px] font-bold tracking-[0.08em] text-zinc-900">PALAZUELOS</div>
+              <div className="text-[9px] tracking-[0.4em] uppercase -mt-0.5 text-zinc-400">Grupo Logístico</div>
             </div>
           </a>
 
           <div className="hidden lg:flex items-center gap-8">
             {links.map(l => (
               <a key={l.href} href={l.href}
-                className={`text-[13px] tracking-wide transition-colors duration-300 relative after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#c41e3a] hover:after:w-full after:transition-all after:duration-300 ${
-                  scrolled ? 'text-zinc-500 hover:text-zinc-900' : 'text-white/60 hover:text-white'
-                }`}>
+                className="text-[13px] tracking-wide text-zinc-500 hover:text-zinc-900 transition-colors duration-300 relative after:absolute after:-bottom-1 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#c41e3a] hover:after:w-full after:transition-all after:duration-300">
                 {l.label}
               </a>
             ))}
@@ -112,7 +106,7 @@ function Navbar() {
             </a>
           </div>
 
-          <button onClick={() => setOpen(!open)} className={`lg:hidden transition-colors ${scrolled ? 'text-zinc-900' : 'text-white'}`}>
+          <button onClick={() => setOpen(!open)} className="lg:hidden text-zinc-900">
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
@@ -148,15 +142,17 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.25], [1, 0])
 
   return (
-    <section className="relative min-h-[100svh] flex items-center overflow-hidden bg-[#0a0a0f]">
-      {/* Atmospheric layers */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#12111a] to-[#0a0a0f]" />
+    <section className="relative min-h-[100svh] flex items-center overflow-hidden bg-white">
+      {/* Subtle warm texture */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#fdfcfa] to-[#f8f5f0]" />
       <div className="absolute inset-0 opacity-[0.03]"
-        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(196,30,58,0.8) 0.5px, transparent 0)', backgroundSize: '48px 48px' }}
+        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #c41e3a 0.5px, transparent 0)', backgroundSize: '48px 48px' }}
       />
-      <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-[#c41e3a]/10 blur-[250px] rounded-full" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#c41e3a]/5 blur-[200px] rounded-full" />
-      <div className="absolute top-0 right-[30%] w-[1px] h-full bg-gradient-to-b from-transparent via-white/[0.04] to-transparent" />
+      {/* Soft red glow accents */}
+      <div className="absolute top-1/3 right-0 w-[600px] h-[600px] bg-[#c41e3a]/[0.04] blur-[200px] rounded-full" />
+      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#c41e3a]/[0.03] blur-[150px] rounded-full" />
+      {/* Decorative vertical line */}
+      <div className="absolute top-0 right-[30%] w-[1px] h-full bg-gradient-to-b from-transparent via-zinc-200/50 to-transparent" />
 
       <motion.div style={{ y, opacity }} className="relative z-10 max-w-7xl mx-auto px-6 lg:px-16 w-full">
         <div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-center">
@@ -166,14 +162,14 @@ function Hero() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
             >
-              <SectionLabel text="Desde 1920" light />
+              <SectionLabel text="Desde 1920" />
             </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.5 }}
-              className="font-['Playfair_Display'] text-[clamp(3rem,8vw,6.5rem)] font-bold text-white leading-[0.92] mb-8 tracking-tight"
+              className="font-['Playfair_Display'] text-[clamp(3rem,8vw,6.5rem)] font-bold text-zinc-900 leading-[0.92] mb-8 tracking-tight"
             >
               Movemos
               <br />
@@ -183,7 +179,7 @@ function Hero() {
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
                   transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
-                  className="absolute -bottom-2 left-0 w-full h-[3px] bg-[#c41e3a]/40 origin-left"
+                  className="absolute -bottom-2 left-0 w-full h-[3px] bg-[#c41e3a]/25 origin-left"
                 />
               </span>
               <br />
@@ -194,7 +190,7 @@ function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
-              className="text-[17px] text-white/50 max-w-md leading-[1.8] mb-12 font-light"
+              className="text-[17px] text-zinc-500 max-w-md leading-[1.8] mb-12 font-light"
             >
               Más de un siglo facilitando el comercio exterior de México. Agentes aduanales, freight forwarding y logística integral con infraestructura propia.
             </motion.p>
@@ -206,12 +202,12 @@ function Hero() {
               className="flex flex-wrap gap-5"
             >
               <a href="#servicios"
-                className="group inline-flex items-center gap-3 px-8 py-4 bg-[#c41e3a] text-white text-[13px] font-semibold tracking-[0.12em] hover:bg-[#d42a47] transition-all duration-300 shadow-2xl shadow-[#c41e3a]/30 hover:shadow-[#c41e3a]/50 hover:-translate-y-0.5">
+                className="group inline-flex items-center gap-3 px-8 py-4 bg-[#c41e3a] text-white text-[13px] font-semibold tracking-[0.12em] hover:bg-[#a01830] transition-all duration-300 shadow-xl shadow-[#c41e3a]/20 hover:shadow-[#c41e3a]/35 hover:-translate-y-0.5">
                 NUESTROS SERVICIOS
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </a>
               <a href="#historia"
-                className="inline-flex items-center gap-3 px-8 py-4 text-white/50 text-[13px] font-medium tracking-[0.12em] hover:text-white border border-white/15 hover:border-white/30 transition-all duration-300 hover:-translate-y-0.5">
+                className="inline-flex items-center gap-3 px-8 py-4 text-zinc-600 text-[13px] font-medium tracking-[0.12em] hover:text-zinc-900 border border-zinc-300 hover:border-[#c41e3a] transition-all duration-300 hover:-translate-y-0.5">
                 NUESTRA HISTORIA
               </a>
             </motion.div>
@@ -224,7 +220,7 @@ function Hero() {
             transition={{ duration: 1, delay: 0.8 }}
             className="hidden lg:block"
           >
-            <div className="grid grid-cols-2 gap-[1px] bg-white/[0.06] overflow-hidden">
+            <div className="grid grid-cols-2 gap-[1px] bg-zinc-200/70 overflow-hidden shadow-xl shadow-zinc-200/40">
               {[
                 { num: 100, suffix: '+', label: 'Años de experiencia', icon: Clock },
                 { num: 6, suffix: '', label: 'Empresas especializadas', icon: Users },
@@ -236,13 +232,13 @@ function Hero() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 1 + i * 0.1 }}
-                  className="bg-white/[0.03] backdrop-blur-sm p-8 group hover:bg-white/[0.06] transition-all duration-500 border border-white/[0.04]"
+                  className="bg-white p-8 group hover:bg-[#fafaf8] transition-all duration-500"
                 >
-                  <Icon className="w-5 h-5 text-[#c41e3a]/70 mb-5 group-hover:text-[#c41e3a] transition-colors duration-500" />
-                  <div className="font-['Playfair_Display'] text-4xl font-bold text-white mb-2 tracking-tight">
+                  <Icon className="w-5 h-5 text-[#c41e3a]/60 mb-5 group-hover:text-[#c41e3a] transition-colors duration-500" />
+                  <div className="font-['Playfair_Display'] text-4xl font-bold text-zinc-900 mb-2 tracking-tight">
                     <Counter end={num} suffix={suffix} />
                   </div>
-                  <div className="text-[13px] text-white/35 font-light">{label}</div>
+                  <div className="text-[13px] text-zinc-400 font-light">{label}</div>
                 </motion.div>
               ))}
             </div>
@@ -262,9 +258,9 @@ function Hero() {
             { num: 50, suffix: '+', label: 'Países' },
             { num: 24, suffix: '/7', label: 'Operación' },
           ].map(({ num, suffix = '', label }, i) => (
-            <div key={i} className="bg-white/[0.04] border border-white/[0.06] p-5 text-center">
-              <div className="font-['Playfair_Display'] text-2xl font-bold text-white"><Counter end={num} suffix={suffix} /></div>
-              <div className="text-[11px] text-white/30 mt-1">{label}</div>
+            <div key={i} className="bg-white border border-zinc-200/70 p-5 text-center shadow-sm">
+              <div className="font-['Playfair_Display'] text-2xl font-bold text-zinc-900"><Counter end={num} suffix={suffix} /></div>
+              <div className="text-[11px] text-zinc-400 mt-1">{label}</div>
             </div>
           ))}
         </motion.div>
@@ -277,7 +273,7 @@ function Hero() {
         className="absolute bottom-10 left-1/2 -translate-x-1/2"
       >
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}>
-          <ChevronDown className="w-5 h-5 text-white/25" />
+          <ChevronDown className="w-5 h-5 text-zinc-400" />
         </motion.div>
       </motion.div>
     </section>
@@ -318,7 +314,7 @@ function Historia() {
 
   return (
     <section id="historia" className="relative py-32 bg-[#fafaf8] overflow-hidden">
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#f5f0ea]/50 to-transparent" />
+      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#f5f0ea]/40 to-transparent" />
       <div className="relative max-w-7xl mx-auto px-6 lg:px-16">
         <Reveal>
           <SectionLabel text="Nuestra Historia" />
@@ -386,7 +382,7 @@ function Servicios() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {services.map((s, i) => (
             <Reveal key={i} delay={i * 0.05}>
-              <div className="group bg-[#fafaf8] p-7 h-full hover:bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-500 border border-transparent hover:border-zinc-100 relative overflow-hidden">
+              <div className="group bg-[#fafaf8] p-7 h-full hover:bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-500 border border-zinc-100/80 hover:border-zinc-200 relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-0 h-[2px] bg-[#c41e3a] group-hover:w-full transition-all duration-700 ease-out" />
                 <div className="w-11 h-11 bg-white group-hover:bg-[#c41e3a]/[0.06] flex items-center justify-center mb-6 transition-colors duration-500 border border-zinc-100 group-hover:border-[#c41e3a]/10">
                   <s.icon className="w-[18px] h-[18px] text-zinc-400 group-hover:text-[#c41e3a] transition-colors duration-500" />
@@ -413,19 +409,19 @@ function Empresas() {
   ]
 
   return (
-    <section id="empresas" className="relative py-32 bg-[#0a0a0f] overflow-hidden">
+    <section id="empresas" className="relative py-32 bg-[#fafaf8] overflow-hidden">
       <div className="absolute inset-0 opacity-[0.02]"
-        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(196,30,58,0.8) 0.5px, transparent 0)', backgroundSize: '32px 32px' }}
+        style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #c41e3a 0.5px, transparent 0)', backgroundSize: '32px 32px' }}
       />
-      <div className="absolute top-0 left-1/3 w-[500px] h-[300px] bg-[#c41e3a]/8 blur-[200px] rounded-full" />
+      <div className="absolute top-0 left-1/3 w-[500px] h-[300px] bg-[#c41e3a]/[0.03] blur-[200px] rounded-full" />
 
       <div className="relative max-w-7xl mx-auto px-6 lg:px-16">
         <Reveal>
-          <SectionLabel text="Nuestras Empresas" light />
-          <h2 className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-white mb-5 tracking-tight leading-[1.05]">
+          <SectionLabel text="Nuestras Empresas" />
+          <h2 className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-zinc-900 mb-5 tracking-tight leading-[1.05]">
             Infraestructura<br /><span className="text-[#c41e3a]">100% propia</span>
           </h2>
-          <p className="text-white/40 max-w-xl text-[17px] leading-[1.8] mb-20 font-light">
+          <p className="text-zinc-500 max-w-xl text-[17px] leading-[1.8] mb-20 font-light">
             Un ecosistema de empresas especializadas que nos permite controlar cada etapa del proceso logístico.
           </p>
         </Reveal>
@@ -433,12 +429,12 @@ function Empresas() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
           {companies.slice(0, 3).map((c, i) => (
             <Reveal key={i} delay={i * 0.1}>
-              <div className="group relative bg-white/[0.03] border border-white/[0.06] hover:border-[#c41e3a]/20 p-9 h-full transition-all duration-500 hover:bg-white/[0.05] overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-[#c41e3a]/0 via-[#c41e3a]/0 to-[#c41e3a]/0 group-hover:from-[#c41e3a]/0 group-hover:via-[#c41e3a]/40 group-hover:to-[#c41e3a]/0 transition-all duration-700" />
-                <div className="text-[10px] tracking-[0.3em] text-[#c41e3a]/60 uppercase mb-4 font-semibold">{c.role}</div>
-                <h3 className="font-['Playfair_Display'] text-2xl font-bold text-white mb-4 tracking-tight">{c.name}</h3>
-                <p className="text-white/40 text-[14px] leading-[1.7] font-light">{c.desc}</p>
-                <div className="mt-8 flex items-center gap-2 text-white/20 group-hover:text-[#c41e3a]/60 transition-colors duration-500">
+              <div className="group relative bg-white border border-zinc-100 hover:border-[#c41e3a]/15 p-9 h-full transition-all duration-500 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-transparent group-hover:bg-gradient-to-r group-hover:from-transparent group-hover:via-[#c41e3a]/40 group-hover:to-transparent transition-all duration-700" />
+                <div className="text-[10px] tracking-[0.3em] text-[#c41e3a] uppercase mb-4 font-semibold">{c.role}</div>
+                <h3 className="font-['Playfair_Display'] text-2xl font-bold text-zinc-900 mb-4 tracking-tight">{c.name}</h3>
+                <p className="text-zinc-500 text-[14px] leading-[1.7] font-light">{c.desc}</p>
+                <div className="mt-8 flex items-center gap-2 text-zinc-300 group-hover:text-[#c41e3a] transition-colors duration-500">
                   <div className="w-6 h-[1px] bg-current" />
                   <ArrowUpRight className="w-3 h-3" />
                 </div>
@@ -449,12 +445,12 @@ function Empresas() {
         <div className="grid md:grid-cols-2 gap-5 mt-5 lg:max-w-[calc(66.666%-0.208rem)] lg:mx-auto">
           {companies.slice(3).map((c, i) => (
             <Reveal key={i + 3} delay={(i + 3) * 0.1}>
-              <div className="group relative bg-white/[0.03] border border-white/[0.06] hover:border-[#c41e3a]/20 p-9 h-full transition-all duration-500 hover:bg-white/[0.05] overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-[#c41e3a]/0 via-[#c41e3a]/0 to-[#c41e3a]/0 group-hover:from-[#c41e3a]/0 group-hover:via-[#c41e3a]/40 group-hover:to-[#c41e3a]/0 transition-all duration-700" />
-                <div className="text-[10px] tracking-[0.3em] text-[#c41e3a]/60 uppercase mb-4 font-semibold">{c.role}</div>
-                <h3 className="font-['Playfair_Display'] text-2xl font-bold text-white mb-4 tracking-tight">{c.name}</h3>
-                <p className="text-white/40 text-[14px] leading-[1.7] font-light">{c.desc}</p>
-                <div className="mt-8 flex items-center gap-2 text-white/20 group-hover:text-[#c41e3a]/60 transition-colors duration-500">
+              <div className="group relative bg-white border border-zinc-100 hover:border-[#c41e3a]/15 p-9 h-full transition-all duration-500 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-transparent group-hover:bg-gradient-to-r group-hover:from-transparent group-hover:via-[#c41e3a]/40 group-hover:to-transparent transition-all duration-700" />
+                <div className="text-[10px] tracking-[0.3em] text-[#c41e3a] uppercase mb-4 font-semibold">{c.role}</div>
+                <h3 className="font-['Playfair_Display'] text-2xl font-bold text-zinc-900 mb-4 tracking-tight">{c.name}</h3>
+                <p className="text-zinc-500 text-[14px] leading-[1.7] font-light">{c.desc}</p>
+                <div className="mt-8 flex items-center gap-2 text-zinc-300 group-hover:text-[#c41e3a] transition-colors duration-500">
                   <div className="w-6 h-[1px] bg-current" />
                   <ArrowUpRight className="w-3 h-3" />
                 </div>
@@ -476,7 +472,7 @@ function Cobertura() {
   ]
 
   return (
-    <section id="cobertura" className="relative py-32 bg-[#fafaf8]">
+    <section id="cobertura" className="relative py-32 bg-white">
       <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-zinc-200 to-transparent" />
       <div className="max-w-7xl mx-auto px-6 lg:px-16">
         <Reveal>
@@ -492,9 +488,9 @@ function Cobertura() {
         <div className="grid lg:grid-cols-3 gap-5">
           {modes.map((m, i) => (
             <Reveal key={i} delay={i * 0.12}>
-              <div className="group relative bg-white p-10 h-[280px] flex flex-col items-center justify-center text-center transition-all duration-500 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-zinc-100 hover:border-[#c41e3a]/15 overflow-hidden">
+              <div className="group relative bg-[#fafaf8] p-10 h-[280px] flex flex-col items-center justify-center text-center transition-all duration-500 hover:bg-white hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] border border-zinc-100 hover:border-[#c41e3a]/15 overflow-hidden">
                 <div className="absolute bottom-0 left-0 w-full h-[2px] bg-transparent group-hover:bg-[#c41e3a] transition-all duration-700" />
-                <div className="w-16 h-16 mx-auto mb-6 bg-[#fafaf8] flex items-center justify-center border border-zinc-100 group-hover:border-[#c41e3a]/15 group-hover:bg-[#c41e3a]/[0.04] transition-all duration-500">
+                <div className="w-16 h-16 mx-auto mb-6 bg-white flex items-center justify-center border border-zinc-100 group-hover:border-[#c41e3a]/15 group-hover:bg-[#c41e3a]/[0.04] transition-all duration-500">
                   <m.icon className="w-6 h-6 text-[#c41e3a]" />
                 </div>
                 <h3 className="font-['Playfair_Display'] text-2xl font-bold text-zinc-900 mb-3 tracking-tight">{m.label}</h3>
@@ -541,7 +537,7 @@ function CTA() {
           <h2 className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-white mb-6 leading-tight">
             ¿Listo para mover tu carga?
           </h2>
-          <p className="text-xl text-white/75 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
             Cotiza con nosotros y descubre por qué más de 100 años de experiencia hacen la diferencia.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
@@ -616,7 +612,7 @@ function Contacto() {
                   <input placeholder="Teléfono"
                     className="w-full bg-white border border-zinc-200 px-4 py-3.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#c41e3a] focus:ring-1 focus:ring-[#c41e3a]/20 focus:outline-none transition-all" />
                 </div>
-                <select className="w-full bg-white border border-zinc-200 px-4 py-3.5 text-sm text-zinc-500 focus:border-[#c41e3a] focus:ring-1 focus:ring-[#c41e3a]/20 focus:outline-none transition-all">
+                <select className="w-full bg-white border border-zinc-200 px-4 py-3.5 text-sm text-zinc-500 focus:border-[#c41e3a] focus:ring-1 focus:ring-[#c41e3a]/20 focus:outline-none transition-all appearance-none">
                   <option>Tipo de servicio</option>
                   <option>Importación</option>
                   <option>Exportación</option>
@@ -634,7 +630,7 @@ function Contacto() {
                 <textarea placeholder="Descripción de la mercancía" rows={3}
                   className="w-full bg-white border border-zinc-200 px-4 py-3.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-[#c41e3a] focus:ring-1 focus:ring-[#c41e3a]/20 focus:outline-none transition-all resize-none" />
                 <button type="submit"
-                  className="w-full py-4 bg-[#c41e3a] text-white text-[13px] font-bold tracking-[0.15em] hover:bg-[#d42a47] transition-all duration-300 shadow-lg shadow-[#c41e3a]/20 hover:shadow-[#c41e3a]/30 hover:-translate-y-0.5">
+                  className="w-full py-4 bg-[#c41e3a] text-white text-[13px] font-bold tracking-[0.15em] hover:bg-[#a01830] transition-all duration-300 shadow-lg shadow-[#c41e3a]/20 hover:shadow-[#c41e3a]/30 hover:-translate-y-0.5">
                   ENVIAR COTIZACIÓN
                 </button>
               </form>
@@ -649,7 +645,7 @@ function Contacto() {
 /* ─── FOOTER ─── */
 function Footer() {
   return (
-    <footer className="bg-[#0a0a0f] py-20 border-t border-white/[0.04]">
+    <footer className="bg-zinc-50 border-t border-zinc-200 py-20">
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div>
@@ -657,42 +653,42 @@ function Footer() {
               <div className="w-9 h-9 bg-[#c41e3a] flex items-center justify-center">
                 <span className="font-['Playfair_Display'] text-white text-sm font-bold">P</span>
               </div>
-              <span className="font-['Playfair_Display'] text-white font-bold tracking-wide">PALAZUELOS</span>
+              <span className="font-['Playfair_Display'] text-zinc-900 font-bold tracking-wide">PALAZUELOS</span>
             </div>
-            <p className="text-sm text-white/35 leading-relaxed font-light">
+            <p className="text-sm text-zinc-500 leading-relaxed font-light">
               Marítimo · Aéreo · Terrestre<br />
               Facilitando el comercio exterior de México desde 1920.
             </p>
           </div>
           <div>
-            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a]/70 uppercase mb-5 font-semibold">Servicios</h4>
-            <ul className="space-y-3 text-sm text-white/35">
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Despacho Aduanal</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Freight Forwarding</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Transporte Terrestre</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Almacenaje</li>
+            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a] uppercase mb-5 font-semibold">Servicios</h4>
+            <ul className="space-y-3 text-sm text-zinc-500">
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Despacho Aduanal</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Freight Forwarding</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Transporte Terrestre</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Almacenaje</li>
             </ul>
           </div>
           <div>
-            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a]/70 uppercase mb-5 font-semibold">Empresas</h4>
-            <ul className="space-y-3 text-sm text-white/35">
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Palazuelos Logistics</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">Trip Mexicana</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">OCUPA</li>
-              <li className="hover:text-white/70 transition-colors cursor-pointer">ALMAN · FRIMAN</li>
+            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a] uppercase mb-5 font-semibold">Empresas</h4>
+            <ul className="space-y-3 text-sm text-zinc-500">
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Palazuelos Logistics</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">Trip Mexicana</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">OCUPA</li>
+              <li className="hover:text-zinc-900 transition-colors cursor-pointer">ALMAN · FRIMAN</li>
             </ul>
           </div>
           <div>
-            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a]/70 uppercase mb-5 font-semibold">Legal</h4>
-            <ul className="space-y-3 text-sm text-white/35">
-              <li><a href="#" className="hover:text-white/70 transition-colors">Aviso de Privacidad</a></li>
-              <li><a href="#" className="hover:text-white/70 transition-colors">Términos y Condiciones</a></li>
+            <h4 className="text-[10px] tracking-[0.25em] text-[#c41e3a] uppercase mb-5 font-semibold">Legal</h4>
+            <ul className="space-y-3 text-sm text-zinc-500">
+              <li><a href="#" className="hover:text-zinc-900 transition-colors">Aviso de Privacidad</a></li>
+              <li><a href="#" className="hover:text-zinc-900 transition-colors">Términos y Condiciones</a></li>
             </ul>
           </div>
         </div>
-        <div className="border-t border-white/[0.06] pt-8 flex flex-wrap justify-between items-center gap-4">
-          <p className="text-xs text-white/25">© {new Date().getFullYear()} AJ Palazuelos S.C. Todos los derechos reservados.</p>
-          <p className="text-xs text-white/25">Operador Económico Autorizado · Certificado por el SAT</p>
+        <div className="border-t border-zinc-200 pt-8 flex flex-wrap justify-between items-center gap-4">
+          <p className="text-xs text-zinc-400">© {new Date().getFullYear()} AJ Palazuelos S.C. Todos los derechos reservados.</p>
+          <p className="text-xs text-zinc-400">Operador Económico Autorizado · Certificado por el SAT</p>
         </div>
       </div>
     </footer>
