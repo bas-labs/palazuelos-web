@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Lenis from '@studio-freight/lenis'
 import gsap from 'gsap'
@@ -15,23 +15,25 @@ function ScrollToTop() {
 }
 
 export function RootLayout() {
-  const lenisRef = useRef<Lenis | null>(null)
-
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     })
-    lenisRef.current = lenis
 
+    // Correct Lenis + GSAP integration:
+    // Use requestAnimationFrame loop (not GSAP ticker) for Lenis
+    // and just connect ScrollTrigger.update to lenis scroll events
     lenis.on('scroll', ScrollTrigger.update)
-    const rafCallback = (time: number) => { lenis.raf(time * 1000) }
-    gsap.ticker.add(rafCallback)
-    gsap.ticker.lagSmoothing(0)
+
+    function raf(time: number) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
 
     return () => {
-      gsap.ticker.remove(rafCallback)
       lenis.destroy()
     }
   }, [])
