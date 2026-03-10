@@ -86,14 +86,12 @@ export function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-[#c41e3a] flex items-center justify-center transition-transform duration-300 group-hover:scale-105">
-              <span className="font-['Playfair_Display'] text-white text-lg font-bold">P</span>
-            </div>
-            <div className="hidden sm:block">
-              <div className="font-['Playfair_Display'] text-[15px] font-bold tracking-[0.08em] text-zinc-900">PALAZUELOS</div>
-              <div className="text-[9px] tracking-[0.4em] uppercase -mt-0.5 text-zinc-400">Grupo Logístico</div>
-            </div>
+          <Link to="/" className="group">
+            <img
+              src="/images/logos/logoPalazuelos.png"
+              alt="Grupo Palazuelos"
+              className="h-12 w-auto transition-transform duration-300 group-hover:scale-105"
+            />
           </Link>
 
           <div className="hidden lg:flex items-center gap-8">

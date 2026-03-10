@@ -151,31 +151,37 @@ export default function Home() {
     )
   }, { scope: containerRef })
 
-  /* ── Horizontal scroll services (sticky approach — no GSAP pin) ── */
+  /* ── Horizontal scroll services (CSS sticky — NO GSAP pin) ── */
   useGSAP(() => {
     if (!servicesTrackRef.current || !servicesSectionRef.current) return
 
     ScrollTrigger.matchMedia({
       '(min-width: 1024px)': () => {
         const track = servicesTrackRef.current!
+        const section = servicesSectionRef.current!
         const totalScroll = track.scrollWidth - window.innerWidth
+        if (totalScroll <= 0) return // All cards visible, no scroll needed
 
-        // Set the wrapper height so there's enough scroll distance
-        gsap.set(servicesSectionRef.current, { height: totalScroll + window.innerHeight })
+        // Set section height and force browser to compute layout before GSAP reads positions
+        section.style.height = `${totalScroll + window.innerHeight}px`
+        void section.offsetHeight // force reflow
 
         gsap.to(track, {
           x: -totalScroll,
           ease: 'none',
           scrollTrigger: {
-            trigger: servicesSectionRef.current,
+            trigger: section,
             start: 'top top',
-            end: 'bottom bottom',
+            end: `+=${totalScroll}`,
             scrub: true,
             invalidateOnRefresh: true,
           },
         })
+
+        return () => { section.style.height = '' }
       },
       '(max-width: 1023px)': () => {
+        servicesSectionRef.current!.style.height = ''
         const cards = servicesTrackRef.current!.querySelectorAll('[data-service-card]')
         gsap.fromTo(cards,
           { y: 50, opacity: 0 },
@@ -201,17 +207,20 @@ export default function Home() {
     })
   }, { scope: containerRef })
 
-  /* ── Pinned giant counter section — scroll-scrubbed ── */
+  /* ── Giant counter section — CSS sticky, NO GSAP pin ── */
   useGSAP(() => {
     if (!statsPinRef.current || !statsOverlayRef.current || !giantCounterRef.current || !giantCounterNumRef.current) return
+
+    const section = statsPinRef.current
+    const scrollDist = Math.round(window.innerHeight * 1.5)
+    section.style.height = `${scrollDist + window.innerHeight}px`
 
     const counterObj = { val: 0 }
     const tl = gsap.timeline({
       scrollTrigger: {
-        trigger: statsPinRef.current,
+        trigger: section,
         start: 'top top',
-        end: '+=150%',
-        pin: true,
+        end: 'bottom bottom',
         scrub: true,
       },
     })
@@ -488,19 +497,21 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── PINNED GIANT COUNTER ─── */}
-      <section ref={statsPinRef} className="relative h-[100vh] flex items-center justify-center bg-[#fafaf8] overflow-hidden">
-        <div className="text-center select-none">
-          <div ref={giantCounterNumRef} className="font-['Playfair_Display'] text-[clamp(8rem,30vw,22rem)] font-bold text-zinc-200 leading-none tracking-tighter">
-            <span ref={giantCounterRef}>0+</span>
+      {/* ─── GIANT COUNTER (CSS sticky — NO GSAP pin) ─── */}
+      <section ref={statsPinRef} className="relative bg-[#fafaf8]">
+        <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
+          <div className="text-center select-none">
+            <div ref={giantCounterNumRef} className="font-['Playfair_Display'] text-[clamp(8rem,30vw,22rem)] font-bold text-zinc-200 leading-none tracking-tighter">
+              <span ref={giantCounterRef}>0+</span>
+            </div>
+            <div ref={statsOverlayRef} className="opacity-0 -mt-16 relative z-10">
+              <p className="text-[clamp(1rem,2.5vw,1.8rem)] text-[#c41e3a] font-medium tracking-[0.15em] uppercase">Años de experiencia</p>
+            </div>
           </div>
-          <div ref={statsOverlayRef} className="opacity-0 -mt-16 relative z-10">
-            <p className="text-[clamp(1rem,2.5vw,1.8rem)] text-[#c41e3a] font-medium tracking-[0.15em] uppercase">Años de experiencia</p>
-          </div>
+          {/* Decorative architectural lines */}
+          <div className="absolute top-0 left-[15%] w-[1px] h-full bg-zinc-200/30" />
+          <div className="absolute top-0 right-[22%] w-[1px] h-full bg-zinc-200/20" />
         </div>
-        {/* Decorative architectural lines */}
-        <div className="absolute top-0 left-[15%] w-[1px] h-full bg-zinc-200/30" />
-        <div className="absolute top-0 right-[22%] w-[1px] h-full bg-zinc-200/20" />
       </section>
 
       {/* ─── HISTORIA PREVIEW ─── */}
@@ -566,31 +577,30 @@ export default function Home() {
                 Toda la cadena<br />
                 <span className="text-[#c41e3a]">logística</span>
               </h2>
-              <p data-para-reveal className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light lg:text-right">
-                A diferencia de nuestros competidores, cubrimos cada eslabón con
-                infraestructura propia — desde el despacho aduanal hasta la
-                entrega final.
-              </p>
+              <div className="lg:text-right">
+                <p data-para-reveal className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light mb-6">
+                  A diferencia de nuestros competidores, cubrimos cada eslabón con
+                  infraestructura propia — desde el despacho aduanal hasta la
+                  entrega final.
+                </p>
+                <MagneticLink
+                  to="/servicios"
+                  className="group inline-flex items-center gap-3 px-8 py-4 bg-[#c41e3a] text-white text-[12px] font-semibold tracking-[0.15em] hover:bg-[#a01830] transition-colors duration-300 shadow-lg shadow-[#c41e3a]/20"
+                >
+                  VER TODOS
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+                </MagneticLink>
+              </div>
             </div>
           </div>
 
           {/* Horizontal track */}
-          <div ref={servicesTrackRef} className="flex gap-6 pl-6 lg:pl-20 pr-[30vw]">
+          <div ref={servicesTrackRef} className="flex gap-6 pl-6 lg:pl-20">
             {services.map((service) => (
               <div key={service.slug} data-service-card className="w-[340px] shrink-0">
                 <ServiceCard service={service} />
               </div>
             ))}
-            {/* End spacer with CTA */}
-            <div className="w-[340px] shrink-0 flex items-center justify-center">
-              <MagneticLink
-                to="/servicios"
-                className="group inline-flex items-center gap-3 px-10 py-5 bg-[#c41e3a] text-white text-[13px] font-semibold tracking-[0.15em] hover:bg-[#a01830] transition-colors duration-300 shadow-2xl shadow-[#c41e3a]/25"
-              >
-                VER TODOS
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
-              </MagneticLink>
-            </div>
           </div>
         </div>
       </section>

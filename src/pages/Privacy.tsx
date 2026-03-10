@@ -1,10 +1,14 @@
+import { useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { PageBanner } from '@/components/layout/PageBanner'
-import { Reveal } from '@/components/ui/Reveal'
+import { useScrollAnimations } from '@/hooks/useScrollAnimations'
 
 export default function Privacy() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  useScrollAnimations(containerRef)
+
   return (
-    <>
+    <div ref={containerRef}>
       <Helmet>
         <title>Aviso de Privacidad — Grupo Palazuelos</title>
         <meta
@@ -23,12 +27,15 @@ export default function Privacy() {
       {/* ── Contenido Legal ────────────────────────────────── */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-16">
-          <Reveal>
-            <div className="prose prose-zinc max-w-none">
-              <h2 className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-8 leading-tight">
-                Aviso de Privacidad Integral
-              </h2>
+          <div className="prose prose-zinc max-w-none">
+            <h2
+              data-heading-reveal
+              className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-8 leading-tight"
+            >
+              Aviso de Privacidad Integral
+            </h2>
 
+            <div data-para-reveal>
               <p className="text-zinc-600 text-[15px] leading-relaxed mb-6">
                 En cumplimiento con lo dispuesto por la Ley Federal de Protección de Datos Personales
                 en Posesión de los Particulares (LFPDPPP) y su Reglamento, <strong>A.J. Palazuelos S.C.</strong>,
@@ -139,9 +146,9 @@ export default function Privacy() {
                 Última actualización: 14 de abril de 2013.
               </p>
             </div>
-          </Reveal>
+          </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

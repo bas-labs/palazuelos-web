@@ -12,7 +12,7 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background: #ffffff;
   color: #1a1a1a;
-  overflow-x: hidden;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

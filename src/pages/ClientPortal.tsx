@@ -1,8 +1,9 @@
+import { useRef } from 'react'
 import { ExternalLink, Download, Shield } from 'lucide-react'
 import { Helmet } from 'react-helmet-async'
 import { PageBanner } from '@/components/layout/PageBanner'
-import { Reveal } from '@/components/ui/Reveal'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { useScrollAnimations } from '@/hooks/useScrollAnimations'
 
 const trackingLinks = [
   {
@@ -18,8 +19,11 @@ const trackingLinks = [
 ]
 
 export default function ClientPortal() {
+  const containerRef = useRef<HTMLDivElement>(null)
+  useScrollAnimations(containerRef)
+
   return (
-    <>
+    <div ref={containerRef}>
       <Helmet>
         <title>Mi Logística — Grupo Palazuelos</title>
         <meta
@@ -38,31 +42,28 @@ export default function ClientPortal() {
       {/* ── Instrucciones ──────────────────────────────────── */}
       <section className="py-24 lg:py-32 bg-white">
         <div className="max-w-4xl mx-auto px-6 lg:px-16">
-          <Reveal>
-            <SectionLabel text="Portal de Clientes" />
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="font-['Playfair_Display'] text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-6 max-w-3xl leading-tight">
-              Rastreo de operaciones
-            </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
-            <div className="flex items-start gap-4 mb-12">
-              <div className="w-12 h-12 flex items-center justify-center bg-[#c41e3a]/10 text-[#c41e3a] shrink-0">
-                <Shield className="w-6 h-6" />
-              </div>
-              <p className="text-zinc-600 text-lg leading-relaxed">
-                A través de nuestro portal de rastreo podrás consultar en tiempo real el estatus
-                de tus operaciones aduanales. Selecciona la aduana correspondiente para acceder
-                al sistema de seguimiento.
-              </p>
+          <SectionLabel text="Portal de Clientes" />
+          <h2
+            data-heading-reveal
+            className="font-['Playfair_Display'] text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-6 max-w-3xl leading-tight"
+          >
+            Rastreo de operaciones
+          </h2>
+          <div data-para-reveal className="flex items-start gap-4 mb-12">
+            <div className="w-12 h-12 flex items-center justify-center bg-[#c41e3a]/10 text-[#c41e3a] shrink-0">
+              <Shield className="w-6 h-6" />
             </div>
-          </Reveal>
+            <p className="text-zinc-600 text-lg leading-relaxed">
+              A través de nuestro portal de rastreo podrás consultar en tiempo real el estatus
+              de tus operaciones aduanales. Selecciona la aduana correspondiente para acceder
+              al sistema de seguimiento.
+            </p>
+          </div>
 
           {/* ── Enlaces de Rastreo ─────────────────────────── */}
           <div className="space-y-6">
-            {trackingLinks.map((link, i) => (
-              <Reveal key={link.label} delay={0.2 + i * 0.1}>
+            {trackingLinks.map((link) => (
+              <div key={link.label} data-card-clip>
                 <a
                   href={link.href}
                   target="_blank"
@@ -79,7 +80,7 @@ export default function ClientPortal() {
                   </div>
                   <ExternalLink className="w-5 h-5 text-[#c41e3a] shrink-0 ml-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
                 </a>
-              </Reveal>
+              </div>
             ))}
           </div>
         </div>
@@ -88,15 +89,14 @@ export default function ClientPortal() {
       {/* ── Descarga de Manual ─────────────────────────────── */}
       <section className="py-24 lg:py-32 bg-[#fafaf8]">
         <div className="max-w-4xl mx-auto px-6 lg:px-16">
-          <Reveal>
-            <SectionLabel text="Recursos" />
-          </Reveal>
-          <Reveal delay={0.1}>
-            <h2 className="font-['Playfair_Display'] text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-12 max-w-3xl leading-tight">
-              Manual de usuario
-            </h2>
-          </Reveal>
-          <Reveal delay={0.2}>
+          <SectionLabel text="Recursos" />
+          <h2
+            data-heading-reveal
+            className="font-['Playfair_Display'] text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 mb-12 max-w-3xl leading-tight"
+          >
+            Manual de usuario
+          </h2>
+          <div data-para-reveal>
             <a
               href="/pdf/Manual.pdf"
               download
@@ -114,9 +114,9 @@ export default function ClientPortal() {
                 </p>
               </div>
             </a>
-          </Reveal>
+          </div>
         </div>
       </section>
-    </>
+    </div>
   )
 }

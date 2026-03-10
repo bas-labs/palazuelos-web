@@ -1,15 +1,19 @@
+import { useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useParams, Navigate, Link } from 'react-router-dom'
 import { Check, ArrowRight } from 'lucide-react'
 import { PageBanner } from '@/components/layout/PageBanner'
-import { Reveal } from '@/components/ui/Reveal'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { useScrollAnimations } from '@/hooks/useScrollAnimations'
 import { getServiceBySlug } from '@/data/services'
 import { companies } from '@/data/companies'
 
 export default function ServiceDetail() {
   const { slug } = useParams<{ slug: string }>()
   const service = slug ? getServiceBySlug(slug) : undefined
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useScrollAnimations(containerRef, [slug])
 
   if (!service) {
     return <Navigate to="/servicios" replace />
@@ -20,7 +24,7 @@ export default function ServiceDetail() {
   )
 
   return (
-    <>
+    <div ref={containerRef}>
       <Helmet>
         <title>{service.title} — Grupo Palazuelos</title>
         <meta name="description" content={service.shortDesc} />
@@ -38,38 +42,32 @@ export default function ServiceDetail() {
       {/* Description */}
       <section className="py-24 bg-[#fafaf8]">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <Reveal>
-            <div className="max-w-3xl">
-              <SectionLabel text={service.title} />
-              <p className="text-lg text-zinc-600 leading-relaxed font-light">
-                {service.description}
-              </p>
-            </div>
-          </Reveal>
+          <div className="max-w-3xl">
+            <SectionLabel text={service.title} />
+            <p data-para-reveal className="text-lg text-zinc-600 leading-relaxed font-light">
+              {service.description}
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Benefits */}
       <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-16">
-          <Reveal>
-            <h2 className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-12 leading-tight">
-              Beneficios
-            </h2>
-          </Reveal>
+          <h2 data-heading-reveal className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-12 leading-tight">
+            Beneficios
+          </h2>
 
-          <ul className="grid sm:grid-cols-2 gap-x-12 gap-y-6 max-w-4xl">
+          <ul data-card-3d-group className="grid sm:grid-cols-2 gap-x-12 gap-y-6 max-w-4xl">
             {service.benefits.map((benefit, i) => (
-              <Reveal key={i} delay={i * 0.05}>
-                <li className="flex items-start gap-4">
-                  <span className="mt-1 flex-shrink-0 w-6 h-6 bg-[#c41e3a]/10 flex items-center justify-center">
-                    <Check className="w-3.5 h-3.5 text-[#c41e3a]" />
-                  </span>
-                  <span className="text-[15px] text-zinc-600 leading-relaxed font-light">
-                    {benefit}
-                  </span>
-                </li>
-              </Reveal>
+              <li key={i} data-card-3d className="flex items-start gap-4">
+                <span className="mt-1 flex-shrink-0 w-6 h-6 bg-[#c41e3a]/10 flex items-center justify-center">
+                  <Check className="w-3.5 h-3.5 text-[#c41e3a]" />
+                </span>
+                <span className="text-[15px] text-zinc-600 leading-relaxed font-light">
+                  {benefit}
+                </span>
+              </li>
             ))}
           </ul>
         </div>
@@ -79,16 +77,14 @@ export default function ServiceDetail() {
       {relatedCompanies.length > 0 && (
         <section className="py-24 bg-[#fafaf8]">
           <div className="max-w-7xl mx-auto px-6 lg:px-16">
-            <Reveal>
-              <SectionLabel text="Empresas relacionadas" />
-              <h2 className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-12 leading-tight">
-                ¿Quién opera este servicio?
-              </h2>
-            </Reveal>
+            <SectionLabel text="Empresas relacionadas" />
+            <h2 data-heading-reveal className="font-['Playfair_Display'] text-3xl sm:text-4xl font-bold text-zinc-900 mb-12 leading-tight">
+              ¿Quién opera este servicio?
+            </h2>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {relatedCompanies.map((company, i) => (
-                <Reveal key={company.slug} delay={i * 0.08}>
+            <div data-card-3d-group className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {relatedCompanies.map((company) => (
+                <div key={company.slug} data-card-3d>
                   <Link
                     to={`/empresas/${company.slug}`}
                     className="group block bg-white p-8 border border-zinc-100/80 hover:border-zinc-200 hover:shadow-[0_8px_40px_rgba(0,0,0,0.06)] transition-all duration-500 relative overflow-hidden"
@@ -113,7 +109,7 @@ export default function ServiceDetail() {
                       <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
                     </span>
                   </Link>
-                </Reveal>
+                </div>
               ))}
             </div>
           </div>
@@ -133,24 +129,22 @@ export default function ServiceDetail() {
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-white/10 blur-[200px] rounded-full" />
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-12 text-center">
-          <Reveal>
-            <h2 className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-white mb-6 leading-tight">
-              Solicita tu cotización
-            </h2>
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Cuéntanos sobre tu operación y recibe una propuesta personalizada
-              para {service.title.toLowerCase()}.
-            </p>
-            <Link
-              to="/cotizador"
-              className="group inline-flex items-center gap-3 px-10 py-4 bg-white text-[#c41e3a] text-[13px] font-bold tracking-[0.1em] hover:bg-zinc-50 transition-all duration-300 shadow-lg hover:-translate-y-0.5"
-            >
-              SOLICITAR COTIZACIÓN
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </Reveal>
+          <h2 data-para-reveal className="font-['Playfair_Display'] text-4xl sm:text-5xl lg:text-[3.5rem] font-bold text-white mb-6 leading-tight">
+            Solicita tu cotización
+          </h2>
+          <p data-para-reveal className="text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+            Cuéntanos sobre tu operación y recibe una propuesta personalizada
+            para {service.title.toLowerCase()}.
+          </p>
+          <Link
+            to="/cotizador"
+            className="group inline-flex items-center gap-3 px-10 py-4 bg-white text-[#c41e3a] text-[13px] font-bold tracking-[0.1em] hover:bg-zinc-50 transition-all duration-300 shadow-lg hover:-translate-y-0.5"
+          >
+            SOLICITAR COTIZACIÓN
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </section>
-    </>
+    </div>
   )
 }
