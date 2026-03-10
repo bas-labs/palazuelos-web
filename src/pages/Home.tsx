@@ -155,31 +155,13 @@ export default function Home() {
   useGSAP(() => {
     if (!servicesTrackRef.current || !servicesSectionRef.current) return
 
-    // Animate services heading & paragraph before pin engages
-    const sHeading = servicesSectionRef.current.querySelector('[data-services-heading]')
-    const sPara = servicesSectionRef.current.querySelector('[data-services-para]')
-    if (sHeading) {
-      gsap.fromTo(sHeading,
-        { x: -80, opacity: 0, clipPath: 'inset(0 100% 0 0)' },
-        { x: 0, opacity: 1, clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power3.out',
-          scrollTrigger: { trigger: servicesSectionRef.current, start: 'top 90%', once: true } },
-      )
-    }
-    if (sPara) {
-      gsap.fromTo(sPara,
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
-          scrollTrigger: { trigger: servicesSectionRef.current, start: 'top 90%', once: true } },
-      )
-    }
-
     ScrollTrigger.matchMedia({
       // Desktop: horizontal scroll
       '(min-width: 1024px)': () => {
         const track = servicesTrackRef.current!
         const totalScroll = track.scrollWidth - window.innerWidth
 
-        const horizontalTween = gsap.to(track, {
+        gsap.to(track, {
           x: -totalScroll,
           ease: 'none',
           scrollTrigger: {
@@ -191,24 +173,6 @@ export default function Home() {
             pinSpacing: true,
             invalidateOnRefresh: true,
           },
-        })
-
-        // Card reveals inside horizontal scroll
-        const cards = track.querySelectorAll('[data-service-card]')
-        cards.forEach(card => {
-          gsap.fromTo(card,
-            { x: 200, opacity: 0, rotateY: 12, scale: 0.85 },
-            {
-              x: 0, opacity: 1, rotateY: 0, scale: 1,
-              duration: 1, ease: 'power3.out',
-              scrollTrigger: {
-                trigger: card,
-                containerAnimation: horizontalTween,
-                start: 'left 85%',
-                toggleActions: 'play none none reverse',
-              },
-            }
-          )
         })
       },
       // Mobile: simple fade-up reveals
@@ -249,7 +213,7 @@ export default function Home() {
         start: 'top top',
         end: '+=150%',
         pin: true,
-        scrub: 1,
+        scrub: true,
       },
     })
 
@@ -326,8 +290,6 @@ export default function Home() {
     const headings = containerRef.current?.querySelectorAll('[data-heading-reveal]')
     if (!headings) return
     headings.forEach(h => {
-      // Skip services heading (handled in its own hook)
-      if ((h as HTMLElement).hasAttribute('data-services-heading')) return
       gsap.fromTo(h,
         { x: -80, opacity: 0, clipPath: 'inset(0 100% 0 0)' },
         {
@@ -346,7 +308,7 @@ export default function Home() {
     paras.forEach(p => {
       const el = p as HTMLElement
       // Skip paragraphs handled by dedicated hooks
-      if (el.hasAttribute('data-services-para') || el.hasAttribute('data-hero-para')) return
+      if (el.hasAttribute('data-hero-para')) return
       gsap.fromTo(p,
         { y: 30, opacity: 0 },
         {
@@ -601,11 +563,11 @@ export default function Home() {
           <div className="px-6 lg:px-20 mb-16">
             <SectionLabel text="Servicios" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-              <h2 data-heading-reveal data-services-heading className="font-['Playfair_Display'] text-[clamp(2.5rem,7vw,5rem)] font-bold text-zinc-900 tracking-tight leading-[1]">
+              <h2 data-heading-reveal className="font-['Playfair_Display'] text-[clamp(2.5rem,7vw,5rem)] font-bold text-zinc-900 tracking-tight leading-[1]">
                 Toda la cadena<br />
                 <span className="text-[#c41e3a]">logística</span>
               </h2>
-              <p data-para-reveal data-services-para className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light lg:text-right">
+              <p data-para-reveal className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light lg:text-right">
                 A diferencia de nuestros competidores, cubrimos cada eslabón con
                 infraestructura propia — desde el despacho aduanal hasta la
                 entrega final.
