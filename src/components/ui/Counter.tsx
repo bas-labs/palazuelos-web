@@ -1,22 +1,29 @@
-import { useEffect, useRef, useState } from 'react'
-import { useInView } from 'framer-motion'
+import { useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export function Counter({ end, suffix = '', duration = 2 }: { end: number; suffix?: string; duration?: number }) {
   const ref = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true })
-  const [count, setCount] = useState(0)
+  const obj = useRef({ val: 0 })
 
-  useEffect(() => {
-    if (!inView) return
-    let start = 0
-    const step = end / (duration * 60)
-    const timer = setInterval(() => {
-      start += step
-      if (start >= end) { setCount(end); clearInterval(timer) }
-      else setCount(Math.floor(start))
-    }, 1000 / 60)
-    return () => clearInterval(timer)
-  }, [inView, end, duration])
+  useGSAP(() => {
+    gsap.to(obj.current, {
+      val: end,
+      duration,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: ref.current,
+        start: 'top 85%',
+        once: true,
+      },
+      onUpdate: () => {
+        if (ref.current) ref.current.textContent = Math.floor(obj.current.val) + suffix
+      },
+    })
+  }, { scope: ref })
 
-  return <span ref={ref}>{count}{suffix}</span>
+  return <span ref={ref}>0{suffix}</span>
 }
