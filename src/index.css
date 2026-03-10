@@ -22,10 +22,6 @@ body {
   color: #ffffff;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 /* Account for fixed navbar on anchor links */
 [id] {
   scroll-margin-top: 5.5rem;
