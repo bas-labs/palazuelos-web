@@ -421,7 +421,7 @@ export default function Home() {
               {/* MASSIVE hero text */}
               <h1
                 ref={heroTextRef}
-                className="font-['Playfair_Display'] text-[clamp(4.5rem,14vw,11rem)] font-bold text-zinc-900 leading-[0.95] mb-10 tracking-[-0.03em] lg:-ml-2"
+                className="font-['Playfair_Display'] text-[clamp(3.5rem,10vw,8rem)] font-bold text-zinc-900 leading-[0.95] mb-10 tracking-[-0.03em] lg:-ml-2"
               >
                 <span className="block overflow-hidden pb-2">
                   <span data-hero-line className="block">Movemos</span>
@@ -432,7 +432,7 @@ export default function Home() {
                   </span>
                 </span>
                 <span className="block overflow-hidden pb-2">
-                  <span data-hero-line className="block text-[clamp(3rem,9vw,7rem)] mt-2 text-zinc-400 font-light italic">
+                  <span data-hero-line className="block text-[clamp(2.5rem,7vw,5.5rem)] mt-2 text-zinc-400 font-light italic">
                     por ti
                   </span>
                 </span>
