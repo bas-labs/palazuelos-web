@@ -70,28 +70,35 @@ export default function Home() {
   const redLineRef = useRef<HTMLDivElement>(null)
   const statsOverlayRef = useRef<HTMLDivElement>(null)
   const statsPinRef = useRef<HTMLElement>(null)
+  const giantCounterRef = useRef<HTMLSpanElement>(null)
+  const giantCounterNumRef = useRef<HTMLDivElement>(null)
 
-  /* ── Hero: split text char-by-char reveal ── */
+  /* ── Hero: line-by-line reveal (overflow-hidden mask) ── */
   useGSAP(() => {
     if (!heroTextRef.current) return
-    // wrap each char in a span
     const lines = heroTextRef.current.querySelectorAll('[data-hero-line]')
-    lines.forEach(line => {
-      const text = line.textContent || ''
-      line.innerHTML = text.split('').map(c =>
-        c === ' ' ? ' ' : `<span class="inline-block" style="clip-path:inset(0 100% 0 0)">${c}</span>`
-      ).join('')
-    })
-
-    const chars = heroTextRef.current.querySelectorAll('span')
-    gsap.to(chars, {
-      clipPath: 'inset(0 0% 0 0)',
-      duration: 0.6,
-      stagger: 0.03,
-      delay: 0.4,
-      ease: 'power3.out',
-    })
+    gsap.fromTo(lines,
+      { yPercent: 110, rotate: 3 },
+      {
+        yPercent: 0,
+        rotate: 0,
+        duration: 1.2,
+        stagger: 0.15,
+        delay: 0.3,
+        ease: 'power4.out',
+      }
+    )
   }, { scope: heroTextRef })
+
+  /* ── Hero paragraph entrance (after char reveal) ── */
+  useGSAP(() => {
+    const heroPara = containerRef.current?.querySelector('[data-hero-para]')
+    if (!heroPara) return
+    gsap.fromTo(heroPara,
+      { y: 30, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8, delay: 1.2, ease: 'power2.out' }
+    )
+  }, { scope: containerRef })
 
   /* ── Hero parallax layers ── */
   useGSAP(() => {
@@ -112,63 +119,107 @@ export default function Home() {
     })
   }, { scope: heroRef })
 
-  /* ── Stat boxes float up ── */
+  /* ── Hero exit: scale down + fade as user scrolls past ── */
+  useGSAP(() => {
+    if (!heroRef.current) return
+    const content = heroRef.current.querySelector('.relative.z-10')
+    if (!content) return
+    gsap.to(content, {
+      scale: 0.92,
+      opacity: 0,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: heroRef.current,
+        start: 'center center',
+        end: 'bottom top',
+        scrub: true,
+      },
+    })
+  }, { scope: heroRef })
+
+  /* ── Stat boxes float up with 3D ── */
   useGSAP(() => {
     const boxes = containerRef.current?.querySelectorAll('[data-stat-box]')
-    if (!boxes) return
-    boxes.forEach((box, i) => {
-      gsap.from(box, {
-        y: 80 + i * 20,
-        opacity: 0,
-        duration: 1,
-        delay: 0.8 + i * 0.15,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: box,
-          start: 'top 90%',
-          once: true,
-        },
-      })
-    })
+    if (!boxes?.length) return
+    gsap.fromTo(boxes,
+      { rotateX: 15, y: 60, opacity: 0, transformOrigin: 'bottom center' },
+      {
+        rotateX: 0, y: 0, opacity: 1,
+        stagger: 0.12, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: boxes[0], start: 'top 85%', once: true },
+      }
+    )
   }, { scope: containerRef })
 
   /* ── Horizontal scroll services ── */
   useGSAP(() => {
     if (!servicesTrackRef.current || !servicesSectionRef.current) return
-    const track = servicesTrackRef.current
-    const totalScroll = track.scrollWidth - window.innerWidth
 
-    gsap.to(track, {
-      x: -totalScroll,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: servicesSectionRef.current,
-        start: 'top top',
-        end: () => `+=${totalScroll}`,
-        pin: true,
-        scrub: 1,
-        anticipatePin: 1,
-        invalidateOnRefresh: true,
+    // Animate services heading & paragraph before pin engages
+    const sHeading = servicesSectionRef.current.querySelector('[data-services-heading]')
+    const sPara = servicesSectionRef.current.querySelector('[data-services-para]')
+    if (sHeading) {
+      gsap.fromTo(sHeading,
+        { x: -80, opacity: 0, clipPath: 'inset(0 100% 0 0)' },
+        { x: 0, opacity: 1, clipPath: 'inset(0 0% 0 0)', duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: servicesSectionRef.current, start: 'top 90%', once: true } },
+      )
+    }
+    if (sPara) {
+      gsap.fromTo(sPara,
+        { y: 30, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
+          scrollTrigger: { trigger: servicesSectionRef.current, start: 'top 90%', once: true } },
+      )
+    }
+
+    ScrollTrigger.matchMedia({
+      // Desktop: horizontal scroll
+      '(min-width: 1024px)': () => {
+        const track = servicesTrackRef.current!
+        const totalScroll = track.scrollWidth - window.innerWidth
+
+        const horizontalTween = gsap.to(track, {
+          x: -totalScroll,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: servicesSectionRef.current,
+            start: 'top top',
+            end: () => `+=${totalScroll}`,
+            pin: true,
+            scrub: true,
+            pinSpacing: true,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        // Card reveals inside horizontal scroll
+        const cards = track.querySelectorAll('[data-service-card]')
+        cards.forEach(card => {
+          gsap.fromTo(card,
+            { x: 200, opacity: 0, rotateY: 12, scale: 0.85 },
+            {
+              x: 0, opacity: 1, rotateY: 0, scale: 1,
+              duration: 1, ease: 'power3.out',
+              scrollTrigger: {
+                trigger: card,
+                containerAnimation: horizontalTween,
+                start: 'left 85%',
+                toggleActions: 'play none none reverse',
+              },
+            }
+          )
+        })
       },
-    })
-
-    // Stagger card reveals inside horizontal scroll
-    const cards = track.querySelectorAll('[data-service-card]')
-    cards.forEach((card, i) => {
-      gsap.from(card, {
-        x: 120,
-        opacity: 0,
-        rotateY: 8,
-        duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: card,
-          containerAnimation: gsap.getById('horizontalScroll') as gsap.core.Animation | undefined,
-          start: 'left 80%',
-          once: true,
-        },
-        delay: i * 0.05,
-      })
+      // Mobile: simple fade-up reveals
+      '(max-width: 1023px)': () => {
+        const cards = servicesTrackRef.current!.querySelectorAll('[data-service-card]')
+        gsap.fromTo(cards,
+          { y: 50, opacity: 0 },
+          { y: 0, opacity: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out',
+            scrollTrigger: { trigger: cards[0], start: 'top 85%', once: true } },
+        )
+      },
     })
   }, { scope: servicesSectionRef })
 
@@ -187,93 +238,104 @@ export default function Home() {
     })
   }, { scope: containerRef })
 
-  /* ── Pinned giant counter section ── */
+  /* ── Pinned giant counter section — scroll-scrubbed ── */
   useGSAP(() => {
-    if (!statsPinRef.current || !statsOverlayRef.current) return
-    gsap.to(statsOverlayRef.current, {
-      opacity: 1,
-      ease: 'none',
+    if (!statsPinRef.current || !statsOverlayRef.current || !giantCounterRef.current || !giantCounterNumRef.current) return
+
+    const counterObj = { val: 0 }
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: statsPinRef.current,
         start: 'top top',
-        end: 'bottom top',
+        end: '+=150%',
         pin: true,
-        scrub: true,
+        scrub: 1,
       },
     })
+
+    // Phase 1 (0-70%): Count 0→100 with scale growth
+    tl.fromTo(giantCounterNumRef.current,
+      { scale: 0.8, opacity: 0.7 },
+      { scale: 1, opacity: 1, duration: 0.7, ease: 'none' },
+      0
+    )
+    tl.to(counterObj, {
+      val: 100, duration: 0.7, ease: 'none',
+      onUpdate: () => {
+        if (giantCounterRef.current) giantCounterRef.current.textContent = Math.floor(counterObj.val) + '+'
+      },
+    }, 0)
+
+    // Phase 2 (70-100%): "Años de experiencia" slides up
+    tl.fromTo(statsOverlayRef.current, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.3, ease: 'power2.out' })
   }, { scope: statsPinRef })
 
-  /* ── Section clip-path transitions ── */
+  /* ── Section clip-path wipe transitions ── */
   useGSAP(() => {
     const sections = containerRef.current?.querySelectorAll('[data-section-reveal]')
     if (!sections) return
     sections.forEach(section => {
-      gsap.from(section, {
-        scale: 0.96,
-        opacity: 0.6,
-        duration: 1.2,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 85%',
-          once: true,
-        },
-      })
+      gsap.fromTo(section,
+        { clipPath: 'inset(0 0 100% 0)' },
+        {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: 1.4,
+          ease: 'power3.inOut',
+          scrollTrigger: { trigger: section, start: 'top 85%', once: true },
+        }
+      )
     })
   }, { scope: containerRef })
 
   /* ── Staggered card reveals (companies) ── */
   useGSAP(() => {
     const cards = containerRef.current?.querySelectorAll('[data-company-card]')
-    if (!cards) return
-    gsap.from(cards, {
-      y: 60,
-      opacity: 0,
-      stagger: 0.08,
-      duration: 0.8,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: cards[0],
-        start: 'top 80%',
-        once: true,
-      },
-    })
+    if (!cards?.length) return
+    const parent = cards[0].parentElement
+    if (parent) gsap.set(parent, { perspective: 800 })
+    gsap.fromTo(cards,
+      { y: 80, opacity: 0, rotateX: 8 },
+      {
+        y: 0, opacity: 1, rotateX: 0,
+        stagger: 0.08, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: cards[0], start: 'top 80%', once: true },
+      }
+    )
   }, { scope: containerRef })
 
-  /* ── Coverage cards stagger ── */
+  /* ── Coverage cards — clip-path wipe-up ── */
   useGSAP(() => {
     const cards = containerRef.current?.querySelectorAll('[data-coverage-card]')
-    if (!cards) return
-    gsap.from(cards, {
-      y: 50,
-      opacity: 0,
-      stagger: 0.12,
-      duration: 0.9,
-      ease: 'power3.out',
-      scrollTrigger: {
-        trigger: cards[0],
-        start: 'top 80%',
-        once: true,
-      },
+    if (!cards?.length) return
+    cards.forEach((card, i) => {
+      gsap.fromTo(card,
+        { clipPath: 'inset(100% 0 0 0)' },
+        {
+          clipPath: 'inset(0 0 0 0)',
+          duration: 0.9,
+          delay: i * 0.12,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: card, start: 'top 80%', once: true },
+        }
+      )
     })
   }, { scope: containerRef })
 
-  /* ── Section headings: slide in from offset ── */
+  /* ── Section headings: slide in + clip reveal ── */
   useGSAP(() => {
     const headings = containerRef.current?.querySelectorAll('[data-heading-reveal]')
     if (!headings) return
     headings.forEach(h => {
-      gsap.from(h, {
-        x: -80,
-        opacity: 0,
-        duration: 1,
-        ease: 'power3.out',
-        scrollTrigger: {
-          trigger: h,
-          start: 'top 80%',
-          once: true,
-        },
-      })
+      // Skip services heading (handled in its own hook)
+      if ((h as HTMLElement).hasAttribute('data-services-heading')) return
+      gsap.fromTo(h,
+        { x: -80, opacity: 0, clipPath: 'inset(0 100% 0 0)' },
+        {
+          x: 0, opacity: 1, clipPath: 'inset(0 0% 0 0)',
+          duration: 1, ease: 'power3.out',
+          scrollTrigger: { trigger: h, start: 'top 80%', once: true },
+        }
+      )
     })
   }, { scope: containerRef })
 
@@ -282,18 +344,46 @@ export default function Home() {
     const paras = containerRef.current?.querySelectorAll('[data-para-reveal]')
     if (!paras) return
     paras.forEach(p => {
-      gsap.from(p, {
-        y: 30,
-        opacity: 0,
-        duration: 0.8,
-        delay: 0.2,
-        ease: 'power2.out',
-        scrollTrigger: {
-          trigger: p,
-          start: 'top 85%',
-          once: true,
-        },
+      const el = p as HTMLElement
+      // Skip paragraphs handled by dedicated hooks
+      if (el.hasAttribute('data-services-para') || el.hasAttribute('data-hero-para')) return
+      gsap.fromTo(p,
+        { y: 30, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.8, delay: 0.2, ease: 'power2.out',
+          scrollTrigger: { trigger: p, start: 'top 85%', once: true },
+        }
+      )
+    })
+  }, { scope: containerRef })
+
+  /* ── Historia timeline: line draw + milestone reveals ── */
+  useGSAP(() => {
+    // Timeline line draw
+    const timelineLine = containerRef.current?.querySelector('[data-timeline-line]')
+    if (timelineLine) {
+      gsap.fromTo(timelineLine,
+        { scaleY: 0, transformOrigin: 'top center' },
+        {
+          scaleY: 1, ease: 'none',
+          scrollTrigger: { trigger: timelineLine, start: 'top 80%', end: 'bottom 80%', scrub: true },
+        }
+      )
+    }
+
+    // Per-milestone orchestrated reveals
+    const milestoneEls = containerRef.current?.querySelectorAll('[data-milestone]')
+    if (!milestoneEls) return
+    milestoneEls.forEach((ms, i) => {
+      const dot = ms.querySelector('[data-milestone-dot]')
+      const year = ms.querySelector('[data-milestone-year]')
+      const text = ms.querySelector('[data-milestone-text]')
+      const tl = gsap.timeline({
+        scrollTrigger: { trigger: ms, start: 'top 90%', once: true },
       })
+      if (dot) tl.fromTo(dot, { scale: 0 }, { scale: 1, duration: 0.4, ease: 'back.out(2)' })
+      if (year) tl.fromTo(year, { x: i % 2 === 0 ? -60 : 60, opacity: 0 }, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, '-=0.2')
+      if (text) tl.fromTo(text, { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out' }, '-=0.4')
     })
   }, { scope: containerRef })
 
@@ -310,7 +400,7 @@ export default function Home() {
       </Helmet>
 
       {/* ─── HERO ─── */}
-      <section ref={heroRef} className="relative min-h-[100svh] flex items-center overflow-hidden bg-white">
+      <section ref={heroRef} className="relative h-[100svh] flex items-end overflow-hidden bg-white">
         {/* Parallax depth layers */}
         <div data-parallax="0.1" className="absolute inset-0 bg-gradient-to-br from-white via-[#fdfcfa] to-[#f8f5f0]" />
         <div data-parallax="0.2" className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, #c41e3a 0.5px, transparent 0)', backgroundSize: '48px 48px' }} />
@@ -320,7 +410,7 @@ export default function Home() {
         <div data-parallax="0.15" className="absolute top-0 right-[28%] w-[1px] h-[200%] bg-gradient-to-b from-transparent via-zinc-200/40 to-transparent" />
         <div data-parallax="0.25" className="absolute top-0 right-[62%] w-[1px] h-[200%] bg-gradient-to-b from-transparent via-zinc-100/30 to-transparent" />
 
-        <div className="relative z-10 w-full max-w-[90rem] mx-auto px-6 lg:px-20 py-32 lg:py-0">
+        <div className="relative z-10 w-full max-w-[90rem] mx-auto px-6 lg:px-20 pb-24 lg:pb-16">
           <div className="grid lg:grid-cols-[1.4fr_0.6fr] gap-16 lg:gap-8 items-center">
             <div>
               {/* Offset label */}
@@ -331,18 +421,24 @@ export default function Home() {
               {/* MASSIVE hero text */}
               <h1
                 ref={heroTextRef}
-                className="font-['Playfair_Display'] text-[clamp(4.5rem,14vw,11rem)] font-bold text-zinc-900 leading-[0.88] mb-10 tracking-[-0.03em] lg:-ml-2"
+                className="font-['Playfair_Display'] text-[clamp(4.5rem,14vw,11rem)] font-bold text-zinc-900 leading-[0.95] mb-10 tracking-[-0.03em] lg:-ml-2"
               >
-                <span data-hero-line className="block">Movemos</span>
-                <span data-hero-line className="block text-[#c41e3a] relative">
-                  el mundo
+                <span className="block overflow-hidden pb-2">
+                  <span data-hero-line className="block">Movemos</span>
                 </span>
-                <span data-hero-line className="block text-[clamp(3rem,9vw,7rem)] mt-2 text-zinc-400 font-light italic">
-                  por ti
+                <span className="block overflow-hidden pb-2">
+                  <span data-hero-line className="block text-[#c41e3a]">
+                    el mundo
+                  </span>
+                </span>
+                <span className="block overflow-hidden pb-2">
+                  <span data-hero-line className="block text-[clamp(3rem,9vw,7rem)] mt-2 text-zinc-400 font-light italic">
+                    por ti
+                  </span>
                 </span>
               </h1>
 
-              <p data-para-reveal className="text-[17px] text-zinc-500 max-w-lg leading-[1.9] mb-14 font-light lg:ml-1">
+              <p data-para-reveal data-hero-para className="text-[17px] text-zinc-500 max-w-lg leading-[1.9] mb-14 font-light lg:ml-1">
                 Más de un siglo facilitando el comercio exterior de México.
                 Agentes aduanales, freight forwarding y logística integral con
                 infraestructura propia.
@@ -367,7 +463,7 @@ export default function Home() {
 
             {/* Stats panel — asymmetric offset */}
             <div className="hidden lg:block lg:translate-y-12">
-              <div className="grid grid-cols-2 gap-[1px] bg-zinc-200/50 shadow-2xl shadow-zinc-200/30">
+              <div className="grid grid-cols-2 gap-[1px] bg-zinc-200/50 shadow-2xl shadow-zinc-200/30" style={{ perspective: '1000px' }}>
                 {[
                   { num: 100, suffix: '+', label: 'Años de experiencia', icon: Clock },
                   { num: 6, suffix: '', label: 'Empresas especializadas', icon: Users },
@@ -434,11 +530,11 @@ export default function Home() {
       {/* ─── PINNED GIANT COUNTER ─── */}
       <section ref={statsPinRef} className="relative h-[100vh] flex items-center justify-center bg-[#fafaf8] overflow-hidden">
         <div className="text-center select-none">
-          <div className="font-['Playfair_Display'] text-[clamp(8rem,30vw,22rem)] font-bold text-zinc-100 leading-none tracking-tighter">
-            <Counter end={100} suffix="+" duration={3} />
+          <div ref={giantCounterNumRef} className="font-['Playfair_Display'] text-[clamp(8rem,30vw,22rem)] font-bold text-zinc-200 leading-none tracking-tighter">
+            <span ref={giantCounterRef}>0+</span>
           </div>
           <div ref={statsOverlayRef} className="opacity-0 -mt-16 relative z-10">
-            <p className="text-[clamp(1rem,2.5vw,1.8rem)] text-zinc-400 font-light tracking-[0.15em] uppercase">Años de experiencia</p>
+            <p className="text-[clamp(1rem,2.5vw,1.8rem)] text-[#c41e3a] font-medium tracking-[0.15em] uppercase">Años de experiencia</p>
           </div>
         </div>
         {/* Decorative architectural lines */}
@@ -447,7 +543,7 @@ export default function Home() {
       </section>
 
       {/* ─── HISTORIA PREVIEW ─── */}
-      <section data-section-reveal className="relative py-48 bg-[#fafaf8] overflow-hidden">
+      <section className="relative pt-48 pb-96 bg-[#fafaf8] overflow-x-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#f5f0ea]/40 to-transparent" />
         <div className="relative max-w-[90rem] mx-auto px-6 lg:px-20">
           <div className="lg:ml-[10%]">
@@ -463,23 +559,23 @@ export default function Home() {
           </div>
 
           <div className="relative">
-            <div className="absolute left-5 lg:left-1/2 top-0 bottom-0 w-[1px] bg-gradient-to-b from-[#c41e3a]/20 via-[#c41e3a]/10 to-transparent" />
+            <div data-timeline-line className="absolute left-5 lg:left-1/2 top-0 bottom-0 w-[1px] bg-[#c41e3a]/15" />
             {milestones.map((m, i) => (
               <div
                 key={i}
-                data-company-card
+                data-milestone
                 className={`relative flex flex-col lg:flex-row items-start gap-8 mb-20 last:mb-0 ${
                   i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'
                 }`}
               >
                 <div className={`lg:w-1/2 pl-14 lg:pl-0 ${i % 2 === 0 ? 'lg:text-right lg:pr-20' : 'lg:pl-20'}`}>
-                  <div className="font-['Playfair_Display'] text-3xl lg:text-5xl font-bold text-[#c41e3a]/60 mb-3">
+                  <div data-milestone-year className="font-['Playfair_Display'] text-3xl lg:text-5xl font-bold text-[#c41e3a]/60 mb-3">
                     {m.year}
                   </div>
-                  <p className="text-zinc-600 leading-relaxed text-[15px]">{m.text}</p>
+                  <p data-milestone-text className="text-zinc-600 leading-relaxed text-[15px]">{m.text}</p>
                 </div>
                 <div className="absolute left-[14px] lg:left-1/2 lg:-translate-x-1/2 top-2">
-                  <div className="w-[11px] h-[11px] rounded-full bg-[#c41e3a] ring-4 ring-[#fafaf8] shadow-sm" />
+                  <div data-milestone-dot className="w-[11px] h-[11px] rounded-full bg-[#c41e3a] ring-4 ring-[#fafaf8] shadow-sm" />
                 </div>
                 <div className="lg:w-1/2" />
               </div>
@@ -499,17 +595,17 @@ export default function Home() {
       </section>
 
       {/* ─── SERVICIOS — HORIZONTAL SCROLL ─── */}
-      <section ref={servicesSectionRef} className="relative bg-white overflow-hidden">
-        <div className="h-screen flex flex-col justify-center">
+      <section ref={servicesSectionRef} className="relative h-screen bg-white">
+        <div className="h-full flex flex-col justify-center">
           {/* Header pinned at left */}
           <div className="px-6 lg:px-20 mb-16">
             <SectionLabel text="Servicios" />
             <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
-              <h2 data-heading-reveal className="font-['Playfair_Display'] text-[clamp(2.5rem,7vw,5rem)] font-bold text-zinc-900 tracking-tight leading-[1]">
+              <h2 data-heading-reveal data-services-heading className="font-['Playfair_Display'] text-[clamp(2.5rem,7vw,5rem)] font-bold text-zinc-900 tracking-tight leading-[1]">
                 Toda la cadena<br />
                 <span className="text-[#c41e3a]">logística</span>
               </h2>
-              <p data-para-reveal className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light lg:text-right">
+              <p data-para-reveal data-services-para className="text-zinc-500 max-w-md text-[15px] leading-[1.8] font-light lg:text-right">
                 A diferencia de nuestros competidores, cubrimos cada eslabón con
                 infraestructura propia — desde el despacho aduanal hasta la
                 entrega final.
