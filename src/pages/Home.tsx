@@ -151,15 +151,17 @@ export default function Home() {
     )
   }, { scope: containerRef })
 
-  /* ── Horizontal scroll services ── */
+  /* ── Horizontal scroll services (sticky approach — no GSAP pin) ── */
   useGSAP(() => {
     if (!servicesTrackRef.current || !servicesSectionRef.current) return
 
     ScrollTrigger.matchMedia({
-      // Desktop: horizontal scroll
       '(min-width: 1024px)': () => {
         const track = servicesTrackRef.current!
         const totalScroll = track.scrollWidth - window.innerWidth
+
+        // Set the wrapper height so there's enough scroll distance
+        gsap.set(servicesSectionRef.current, { height: totalScroll + window.innerHeight })
 
         gsap.to(track, {
           x: -totalScroll,
@@ -167,15 +169,12 @@ export default function Home() {
           scrollTrigger: {
             trigger: servicesSectionRef.current,
             start: 'top top',
-            end: () => `+=${totalScroll}`,
-            pin: true,
+            end: 'bottom bottom',
             scrub: true,
-            pinSpacing: true,
             invalidateOnRefresh: true,
           },
         })
       },
-      // Mobile: simple fade-up reveals
       '(max-width: 1023px)': () => {
         const cards = servicesTrackRef.current!.querySelectorAll('[data-service-card]')
         gsap.fromTo(cards,
@@ -505,7 +504,7 @@ export default function Home() {
       </section>
 
       {/* ─── HISTORIA PREVIEW ─── */}
-      <section className="relative pt-48 pb-96 bg-[#fafaf8] overflow-x-hidden">
+      <section className="relative pt-48 pb-96 bg-[#fafaf8]">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-[#f5f0ea]/40 to-transparent" />
         <div className="relative max-w-[90rem] mx-auto px-6 lg:px-20">
           <div className="lg:ml-[10%]">
@@ -557,8 +556,8 @@ export default function Home() {
       </section>
 
       {/* ─── SERVICIOS — HORIZONTAL SCROLL ─── */}
-      <section ref={servicesSectionRef} className="relative h-screen bg-white">
-        <div className="h-full flex flex-col justify-center">
+      <section ref={servicesSectionRef} className="relative bg-white">
+        <div className="sticky top-0 h-screen flex flex-col justify-center overflow-hidden">
           {/* Header pinned at left */}
           <div className="px-6 lg:px-20 mb-16">
             <SectionLabel text="Servicios" />
